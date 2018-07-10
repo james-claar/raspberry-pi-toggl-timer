@@ -39,7 +39,7 @@ require 'config.php';
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        function loadDoc(callback) {
+        function loadDoc() {
             var xhttp = new XMLHttpRequest();
 
             xhttp.onreadystatechange = async function() {
@@ -49,7 +49,6 @@ require 'config.php';
                     console.log("Got data: " + data);
                     description = data[0];
                     duration = data[1];
-                    callback();
                 }
             };
 
@@ -80,29 +79,28 @@ require 'config.php';
             return time;
         };
 
-        loadDoc(function() {
-            console.log("callback worked for daddy!");
-        });
         setInterval(function() {
-            loadDoc(function() {
-                console.log("callback worked for daddy!");
-            });
+          loadDoc();
         }, 1000);
 
         setInterval(function() {
-            console.log("The console should be getting full of these.");
-            var description_span = document.getElementById('description_span'); //set description_span
+            var description_span = document.getElementById('description_span');
+            var duration_span = document.getElementById('duration_span');
+
+            if (description === null) {
+              description_span.innerHTML = "No current task";
+              duration_span.innerHTML = "";
+              return;
+            }
             description_span.innerHTML = description; //show description
 
-            var duration_span = document.getElementById('duration_span'); //set duration_span
-            var date = new Date(); //get current time
-            var seconds = date.getTime() / 1000;
+            var seconds = (new Date()).getTime() / 1000;
             seconds = seconds + duration;
             if(<?= $formatseconds ?>) {
                 seconds = formatSeconds(seconds);
             }
             duration_span.innerHTML = seconds; //show duration
-        }, 1);
+        }, 100);
 
         if(<?= $auto_reload ?>) {
             setTimeout(function() {
